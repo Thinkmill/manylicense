@@ -41,7 +41,7 @@ const excludePrefixes = parseList('--excludePrefix=') // list of exclude package
 const { data } = fs.readFileSync(0)
   .toString('utf8')
   .split('\n')
-  .filter(x => x)
+  .filter(Boolean)
   .map(x => JSON.parse(x))
   .filter(x => x.type === 'table')
   .pop()
