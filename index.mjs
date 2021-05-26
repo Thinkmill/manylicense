@@ -85,7 +85,7 @@ for (const rowArray of body) {
     let packageJson
     try {
       packageJson = JSON.parse(fs.readFileSync(`./node_modules/${name}/package.json`))
-    } catch (e) {} // TODO: probably exact for workspaces
+    } catch (e) {} // TODO: probably not always for workspaces
 
     const {
       description = '',
