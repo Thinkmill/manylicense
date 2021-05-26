@@ -82,18 +82,21 @@ for (const rowArray of body) {
   }
 
   if (printCsv) {
-    const packageJson = JSON.parse(fs.readFileSync(`./node_modules/${name}/package.json`))
+    let packageJson
+    try {
+      packageJson = JSON.parse(fs.readFileSync(`./node_modules/${name}/package.json`))
+    } catch (e) {} // TODO: probably exact for workspaces
+
     const {
       description = '',
       author = '',
       contributors = [],
-
-      homepage,
-      repository
-    } = packageJson
+      homepage = '',
+      repository = ''
+    } = packageJson || {}
 
     const authorName = author?.name || author
-    const contributorNames = contributors.map(x => x?.name || x)
+    const contributorNames = contributors.map ? contributors.map(x => x?.name || x) : contributors
     const everyone = [authorName, ...contributorNames].join(',')
     const urls = [homepage, repository?.url || repository].filter(Boolean).join(',')
 
