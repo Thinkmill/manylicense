@@ -38,8 +38,13 @@ const approved = new Set(parseList('--approved=')) // list of approved SPDX iden
 const excludes = new Set(parseList('--excludes=')) // list of excluded package names
 const excludePrefixes = parseList('--excludePrefix=') // list of exclude package prefixes
 
-const stdin = fs.readFileSync(0)
-const { head, body } = JSON.parse(stdin.toString('utf8'))?.data
+const { data } = fs.readFileSync(0)
+  .toString('utf8')
+  .split('\n')
+  .filter(x => x)
+  .map(x => JSON.parse(x))
+  .filter(x => x.type === 'table')
+  .pop()
 
 function fail (message) {
   console.error(message)
@@ -50,7 +55,9 @@ if (printCsv) {
   console.log(`Name, SPDX, Description, Author/Contributors, URLs`)
 }
 
+const { head, body } = data
 const counts = {}
+
 for (const rowArray of body) {
   const row = {}
   head.forEach((key, i) => (row[key] = rowArray[i]))
@@ -92,6 +99,8 @@ for (const rowArray of body) {
 
     console.log(`${name}, ${spdx}, ${description}, "${everyone}", "${urls}"`)
   }
+
+  counts[spdx] = (counts[spdx] | 0) + 1
 }
 
 if (printCounts) {
