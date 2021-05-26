@@ -103,7 +103,7 @@ for (const rowArray of body) {
     console.log(`${name}, ${spdx}, ${description}, "${everyone}", "${urls}"`)
   }
 
-  counts[spdx] = (counts[spdx] | 0) + 1
+  counts[spdx] = (counts[spdx] || 0) + 1
 }
 
 if (printCounts) {
