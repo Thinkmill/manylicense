@@ -5,6 +5,7 @@ A `node_modules` license-file inspection tool for monorepos that uses yarn works
 
 ## Examples
 ```
+yarn licenses list --json --no-progress | TODO_NAME --csv --approved=MIT,zlib --excludePrefix=@thinkmill
 ```
 
 ## LICENSE [MIT](LICENSE)
