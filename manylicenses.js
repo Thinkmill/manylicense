@@ -64,7 +64,7 @@ if (inheritOptions) {
     if (manylicenses) {
       approved.push(...manylicenses.approve)
       excludes.push(...manylicenses.exclude)
-      excludedPrefixes.push(...manylicenses.excludedPrefix)
+      excludedPrefixes.push(...manylicenses.excludePrefix)
     }
   } catch {}
 }
