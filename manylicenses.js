@@ -38,8 +38,8 @@ const printCsv = argv.includes('--csv')
 const printHelp = argv.includes('-h') || argv.includes('--help')
 const approved = parseList('--approve=') // list of approved SPDX identifiers
 const excludes = parseList('--exclude=') // list of excluded package names
-const excludePrefixes = parseList('--excludePrefix=') // list of exclude package prefixes
-const inheritOptions = argv.includes('--inherit') // inherit options from root package.json
+const excludePrefixes = parseList('--exclude-prefix=') // list of exclude package prefixes
+const verify = !argv.includes('--no-verify') // ignore unapproved licenses
 
 if (printHelp) {
   // print and exit
@@ -49,26 +49,28 @@ Usage: manylicenses [options]
 Options:
   --counts
   --csv
-  --approve=...
-  --exclude=...
-  --excludePrefix=...
-  --inherit
+  --approve=NAME[,...]
+  --exclude=NAME[,...]
+  --exclude-prefix=NAME[,...]
+  --no-verify
   ```)
   process.exit(0)
 }
 
-// inherit options from CWD/package.json
-if (inheritOptions) {
-  let manylicenses
-  try {
-    ({ manylicenses } = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`)))
-  } catch {}
+// merge options from CWD/package.json
+let manylicenses
+try {
+  ({ manylicenses } = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`)))
+} catch {}
 
-  if (manylicenses) {
-    approved.push(...manylicenses?.approve || [])
-    excludes.push(...manylicenses?.exclude || [])
-    excludePrefixes.push(...manylicenses?.excludePrefix || [])
-  }
+function coerceArray (value) {
+  return Array.isArray(value) ? value : [value]
+}
+
+if (manylicenses) {
+  approved.push(...coerceArray(manylicenses?.approve || []))
+  excludes.push(...coerceArray(manylicenses?.exclude || []))
+  excludePrefixes.push(...coerceArray(manylicenses?.excludePrefix || []))
 }
 
 // read everything from stdin
@@ -120,7 +122,7 @@ for (const rowArray of body) {
   })) continue
 
   // exit error code if unapproved
-  if (approved.length && !approved.includes(spdx)) {
+  if (verify && !approved.includes(spdx)) {
     unapproved.push({ name, spdx })
     console.error(`"${name}@${version}" has unapproved license: "${spdx}"`)
   }
