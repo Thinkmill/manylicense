@@ -86,7 +86,7 @@ function fail (message) {
 }
 
 if (printCsv) {
-  console.log(`Name, SPDX, Description, Author/Contributors, URLs`)
+  console.log(`Name, Version, SPDX, Description, Authors/Contributors, URLs`)
 }
 
 const { head, body } = data
