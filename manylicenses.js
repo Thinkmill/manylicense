@@ -59,14 +59,16 @@ Options:
 
 // inherit options from CWD/package.json
 if (inheritOptions) {
+  let manylicenses
   try {
-    const { manylicenses } = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`))
-    if (manylicenses) {
-      approved.push(...manylicenses.approve)
-      excludes.push(...manylicenses.exclude)
-      excludedPrefixes.push(...manylicenses.excludePrefix)
-    }
+    ({ manylicenses } = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`)))
   } catch {}
+
+  if (manylicenses) {
+    approved.push(...manylicenses?.approve || [])
+    excludes.push(...manylicenses?.exclude || [])
+    excludePrefixes.push(...manylicenses?.excludePrefix || [])
+  }
 }
 
 // read everything from stdin
