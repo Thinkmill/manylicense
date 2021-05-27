@@ -65,7 +65,10 @@ for (const rowArray of body) {
 
   const {
     Name: name,
-    License: spdx
+    License: spdx,
+    VendorName: rowAuthorName,
+    VendorURL: rowHomepage,
+    URL: rowRepository,
   } = row
 
   // skip excluded packages
@@ -90,10 +93,10 @@ for (const rowArray of body) {
 
     const {
       description = '',
-      author = '',
+      author = rowAuthorName,
       contributors = [],
-      homepage = '',
-      repository = ''
+      homepage = rowHomepage,
+      repository = rowRepository
     } = packageJson || {}
 
     const authorName = author?.name || author
@@ -101,7 +104,7 @@ for (const rowArray of body) {
     const everyone = [authorName, ...contributorNames].join(',')
     const urls = [homepage, repository?.url || repository].filter(Boolean).join(',')
 
-    console.log(`${name}, ${spdx}, ${description}, "${everyone}", "${urls}"`)
+    console.log(`${name}, "${spdx}", "${description}", "${everyone}", "${urls}"`)
   }
 
   counts[spdx] = (counts[spdx] || 0) + 1
