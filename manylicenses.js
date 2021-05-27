@@ -122,7 +122,7 @@ for (const rowArray of body) {
   // exit error code if unapproved
   if (approved.length && !approved.includes(spdx)) {
     unapproved.push({ name, spdx })
-    console.error(`'${name}@${version}' has unapproved license: '${spdx}'`)
+    console.error(`"${name}@${version}" has unapproved license: "${spdx}"`)
   }
 
   if (printCsv) {
@@ -151,7 +151,7 @@ for (const rowArray of body) {
 }
 
 if (unapproved.length) {
-  fail(`Unapproved licenses: ${[...new Set(unapproved.map(({ spdx }) => `'${spdx}'`))].join(', ')}`)
+  fail(`Unapproved licenses: ${[...new Set(unapproved.map(({ spdx }) => `"${spdx}"`))].join(', ')}`)
 }
 
 if (printCounts) {
