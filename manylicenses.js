@@ -89,6 +89,7 @@ if (printCsv) {
 
 const { head, body } = data
 const counts = {}
+const unapproved = []
 
 for (const rowArray of body) {
   const row = {}
@@ -96,6 +97,7 @@ for (const rowArray of body) {
 
   const {
     Name: name,
+    Version: version,
     License: spdx,
     VendorName: rowAuthorName,
     VendorURL: rowHomepage,
@@ -112,15 +114,15 @@ for (const rowArray of body) {
 
   // exit error code if unapproved
   if (approved.length && !approved.includes(spdx)) {
-    fail(`Unapproved license: ${spdx}`)
-    break
+    unapproved.push({ name, spdx })
+    console.error(`${name}@${version} has unapproved license: ${spdx}`)
   }
 
   if (printCsv) {
     let packageJson
     try {
       packageJson = JSON.parse(fs.readFileSync(`./node_modules/${name}/package.json`))
-    } catch (e) {} // TODO: probably not always for workspaces
+    } catch (e) {} // TODO: workspaces
 
     const {
       description = '',
@@ -135,10 +137,14 @@ for (const rowArray of body) {
     const everyone = [authorName, ...contributorNames].join(',')
     const urls = [homepage, repository?.url || repository].filter(Boolean).join(',')
 
-    console.log(`${name}, "${spdx}", "${description}", "${everyone}", "${urls}"`)
+    console.log(`${name}, "${version}", "${spdx}", "${description}", "${everyone}", "${urls}"`)
   }
 
   counts[spdx] = (counts[spdx] || 0) + 1
+}
+
+if (unapproved.length) {
+  fail(`Unapproved licenses: ${[...new Set(unapproved.map(({ spdx }) => spdx))].join(', ')}`)
 }
 
 if (printCounts) {

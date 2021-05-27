@@ -5,6 +5,11 @@
   "type": "module",
   "author": "Thinkmill Labs Pty Ltd",
   "repository": "https://github.com/thinkmill/manylicenses",
+  "manylicenses": {
+    "approve": [
+      "MIT"
+    ]
+  },
   "bin": {
     "manylicenses": "./manylicenses.js"
   }
