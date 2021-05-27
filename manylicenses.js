@@ -43,7 +43,7 @@ const inheritOptions = argv.include('--inherit') // inherit options from root pa
 
 if (printHelp) {
   // print and exit
-  return console.error(```
+  console.error(```
 Usage: manylicenses [options]
 
 Options:
@@ -54,6 +54,7 @@ Options:
   --excludePrefix=...
   --inherit
   ```)
+  process.exit(0)
 }
 
 // inherit options from CWD/package.json
