@@ -1,5 +1,5 @@
 # ?
-A `node_modules` license-file inspection tool for monorepos that use yarn workspaces.
+A `node_modules` license reporting tool for monorepos that use yarn workspaces.
 
 **WARNING**: This tool is a work in progress, please report any bugs! If you need something safe for your production tooling, this probably isn't for you... yet.
 
