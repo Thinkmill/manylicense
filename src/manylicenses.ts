@@ -67,9 +67,10 @@ let manylicenses:
   | undefined
 
 try {
-  ;({ manylicenses } = JSON.parse(
+  const pkg = JSON.parse(
     fs.readFileSync(`${process.cwd()}/package.json`).toString()
-  ))
+  )
+  manylicenses = pkg.manylicenses
 } catch {}
 
 function coerceArray(value: string | string[]) {
