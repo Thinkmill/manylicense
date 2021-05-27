@@ -35,10 +35,40 @@ function parseList (prefix) {
 
 const printCounts = argv.includes('--counts')
 const printCsv = argv.includes('--csv')
-const approved = new Set(parseList('--approved=')) // list of approved SPDX identifiers
-const excludes = new Set(parseList('--excludes=')) // list of excluded package names
+const printHelp = argv.includes('-h') || argv.includes('--help')
+const approved = new Set(parseList('--approve=')) // list of approved SPDX identifiers
+const excludes = new Set(parseList('--exclude=')) // list of excluded package names
 const excludePrefixes = parseList('--excludePrefix=') // list of exclude package prefixes
+const inheritOptions = argv.include('--inherit') // inherit options from root package.json
 
+if (printHelp) {
+  // print and exit
+  return console.error(```
+Usage: manylicenses [options]
+
+Options:
+  --counts
+  --csv
+  --approve=...
+  --exclude=...
+  --excludePrefix=...
+  --inherit
+  ```)
+}
+
+// inherit options from CWD/package.json
+if (inheritOptions) {
+  try {
+    const { manylicenses } = fs.readFileSync(`${process.cwd()}/package.json`)
+    if (manylicenses) {
+      approved.push(...manylicenses.approved)
+      excludes.push(...manylicenses.excludes)
+      excludedPrefixes.push(...manylicenses.excludedPrefixes)
+    }
+  } catch {}
+}
+
+// read everything from stdin
 const { data } = fs.readFileSync(0)
   .toString('utf8')
   .split('\n')
