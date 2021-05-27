@@ -60,7 +60,7 @@ Options:
 // inherit options from CWD/package.json
 if (inheritOptions) {
   try {
-    const { manylicenses } = fs.readFileSync(`${process.cwd()}/package.json`)
+    const { manylicenses } = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`))
     if (manylicenses) {
       approved.push(...manylicenses.approve)
       excludes.push(...manylicenses.exclude)
