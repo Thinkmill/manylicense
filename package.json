@@ -5,5 +5,7 @@
   "type": "module",
   "author": "Thinkmill Labs Pty Ltd",
   "repository": "https://github.com/thinkmill/manylicenses",
-  "bin": "manylicenses.js"
+  "bin": {
+    "manylicenses": "./manylicenses.js"
+  }
 }

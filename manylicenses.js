@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 //  MIT License
 //
 //  Copyright (c) 2021 Thinkmill Labs Pty Ltd
