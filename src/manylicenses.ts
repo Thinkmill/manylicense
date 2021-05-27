@@ -20,26 +20,26 @@
 //  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
-import fs from "fs";
+import fs from 'fs'
 
-const { argv } = process;
+const { argv } = process
 
 function parseList(prefix: string) {
-  const list = [];
+  const list = []
   for (const arg of argv) {
-    if (!arg.startsWith(prefix)) continue;
-    list.push(...arg.slice(prefix.length).split(","));
+    if (!arg.startsWith(prefix)) continue
+    list.push(...arg.slice(prefix.length).split(','))
   }
-  return list;
+  return list
 }
 
-const printCounts = argv.includes("--counts");
-const printCsv = argv.includes("--csv");
-const printHelp = argv.includes("-h") || argv.includes("--help");
-const approved = parseList("--approve="); // list of approved SPDX identifiers
-const excludes = parseList("--exclude="); // list of excluded package names
-const excludePrefixes = parseList("--exclude-prefix="); // list of exclude package prefixes
-const verify = !argv.includes("--no-verify"); // ignore unapproved licenses
+const printCounts = argv.includes('--counts')
+const printCsv = argv.includes('--csv')
+const printHelp = argv.includes('-h') || argv.includes('--help')
+const approved = parseList('--approve=') // list of approved SPDX identifiers
+const excludes = parseList('--exclude=') // list of excluded package names
+const excludePrefixes = parseList('--exclude-prefix=') // list of exclude package prefixes
+const verify = !argv.includes('--no-verify') // ignore unapproved licenses
 
 if (printHelp) {
   // print and exit
@@ -53,151 +53,151 @@ Options:
   --exclude=NAME[,...]
   --exclude-prefix=NAME[,...]
   --no-verify
-  `);
-  process.exit(0);
+  `)
+  process.exit(0)
 }
 
 // merge options from CWD/package.json
 let manylicenses:
   | {
-      approve?: string | string[];
-      exclude?: string | string[];
-      excludePrefix?: string | string[];
+      approve?: string | string[]
+      exclude?: string | string[]
+      excludePrefix?: string | string[]
     }
-  | undefined;
+  | undefined
 
 try {
-  ({ manylicenses } = JSON.parse(
+  ;({ manylicenses } = JSON.parse(
     fs.readFileSync(`${process.cwd()}/package.json`).toString()
-  ));
+  ))
 } catch {}
 
 function coerceArray(value: string | string[]) {
-  return Array.isArray(value) ? value : [value];
+  return Array.isArray(value) ? value : [value]
 }
 
 if (manylicenses) {
-  approved.push(...coerceArray(manylicenses?.approve || []));
-  excludes.push(...coerceArray(manylicenses?.exclude || []));
-  excludePrefixes.push(...coerceArray(manylicenses?.excludePrefix || []));
+  approved.push(...coerceArray(manylicenses?.approve || []))
+  excludes.push(...coerceArray(manylicenses?.exclude || []))
+  excludePrefixes.push(...coerceArray(manylicenses?.excludePrefix || []))
 }
 
 // read everything from stdin
 const { data } = fs
   .readFileSync(0)
-  .toString("utf8")
-  .split("\n")
+  .toString('utf8')
+  .split('\n')
   .filter(Boolean)
   .map((x) => JSON.parse(x))
-  .filter((x) => x.type === "table")
+  .filter((x) => x.type === 'table')
   .pop() as {
   data: {
-    head: string[];
-    body: string[][];
-  };
-};
+    head: string[]
+    body: string[][]
+  }
+}
 
 function fail(message: string) {
-  console.error(message);
-  process.exit(1);
+  console.error(message)
+  process.exit(1)
 }
 
 if (printCsv) {
-  console.log(`Name, Version, SPDX, Description, Authors/Contributors, URLs`);
+  console.log(`Name, Version, SPDX, Description, Authors/Contributors, URLs`)
 }
 
-const { head, body } = data;
-const counts: Record<string, number> = {};
-const unapproved = [];
+const { head, body } = data
+const counts: Record<string, number> = {}
+const unapproved = []
 
 for (const rowArray of body) {
-  const row: Record<string, string> = {};
+  const row: Record<string, string> = {}
   head.forEach((key, i) => {
-    const value = rowArray[i];
+    const value = rowArray[i]
     // drop unknowns
-    if (value.toLowerCase() === "unknown") return;
-    row[key] = rowArray[i];
-  });
+    if (value.toLowerCase() === 'unknown') return
+    row[key] = rowArray[i]
+  })
 
   const {
-    Name: name = "",
-    Version: version = "",
-    License: spdx = "",
-    VendorName: rowAuthorName = "",
-    VendorURL: rowHomepage = "",
-    URL: rowRepository = "",
-  } = row;
+    Name: name = '',
+    Version: version = '',
+    License: spdx = '',
+    VendorName: rowAuthorName = '',
+    VendorURL: rowHomepage = '',
+    URL: rowRepository = '',
+  } = row
 
   // skip excluded packages
-  if (excludes.includes(name)) continue;
+  if (excludes.includes(name)) continue
 
   // skip if prefix matches
   if (
     excludePrefixes.some((prefix) => {
-      return name.startsWith(prefix);
+      return name.startsWith(prefix)
     })
   )
-    continue;
+    continue
 
   // exit error code if unapproved
   if (verify && !approved.includes(spdx)) {
-    unapproved.push({ name, spdx });
-    console.error(`"${name}@${version}" has unapproved license: "${spdx}"`);
+    unapproved.push({ name, spdx })
+    console.error(`"${name}@${version}" has unapproved license: "${spdx}"`)
   }
 
   if (printCsv) {
     let packageJson: {
-      description?: string;
-      author?: string | { name?: string };
-      contributors?: string | string[] | { name?: string }[];
-      homepage?: string;
-      repository?: string | { type: string; url: string; directory?: string };
-    } = {};
+      description?: string
+      author?: string | { name?: string }
+      contributors?: string | string[] | { name?: string }[]
+      homepage?: string
+      repository?: string | { type: string; url: string; directory?: string }
+    } = {}
 
     try {
       packageJson = JSON.parse(
         fs.readFileSync(`./node_modules/${name}/package.json`).toString()
-      );
+      )
     } catch (e) {} // TODO: workspaces
 
     const {
-      description = "",
+      description = '',
       author = rowAuthorName,
       contributors = [],
       homepage = rowHomepage,
       repository = rowRepository,
-    } = packageJson || {};
+    } = packageJson || {}
 
-    const authorName = typeof author === "string" ? author : author?.name;
+    const authorName = typeof author === 'string' ? author : author?.name
     const contributorNames = Array.isArray(contributors)
       ? contributors.map((x: string | { name?: string }) =>
-          typeof x === "string" ? x : x?.name || x
+          typeof x === 'string' ? x : x?.name || x
         )
-      : contributors;
-    const everyone = [authorName, ...contributorNames].join(",");
+      : contributors
+    const everyone = [authorName, ...contributorNames].join(',')
     const urls = [
       homepage,
-      typeof repository === "string" ? repository : repository?.url,
+      typeof repository === 'string' ? repository : repository?.url,
     ]
       .filter(Boolean)
-      .join(",");
+      .join(',')
 
     console.log(
       `"${name}", "${version}", "${spdx}", "${description}", "${everyone}", "${urls}"`
-    );
+    )
   }
 
-  counts[spdx] = (counts[spdx] || 0) + 1;
+  counts[spdx] = (counts[spdx] || 0) + 1
 }
 
 if (unapproved.length) {
   fail(
     `Unapproved licenses: ${[
       ...new Set(unapproved.map(({ spdx }) => `"${spdx}"`)),
-    ].join(", ")}`
-  );
+    ].join(', ')}`
+  )
 }
 
 if (printCounts) {
-  console.log(counts);
+  console.log(counts)
 }
