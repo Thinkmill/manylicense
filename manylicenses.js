@@ -39,7 +39,7 @@ const printHelp = argv.includes('-h') || argv.includes('--help')
 const approved = new Set(parseList('--approve=')) // list of approved SPDX identifiers
 const excludes = new Set(parseList('--exclude=')) // list of excluded package names
 const excludePrefixes = parseList('--excludePrefix=') // list of exclude package prefixes
-const inheritOptions = argv.include('--inherit') // inherit options from root package.json
+const inheritOptions = argv.includes('--inherit') // inherit options from root package.json
 
 if (printHelp) {
   // print and exit
