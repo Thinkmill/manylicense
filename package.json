@@ -1,8 +1,9 @@
 {
-  "name": "?",
+  "name": "manylicenses",
   "version": "0.0.1",
   "license": "MIT",
   "type": "module",
   "author": "Thinkmill Labs Pty Ltd",
-  "repository": "https://github.com/thinkmill/?"
+  "repository": "https://github.com/thinkmill/manylicenses",
+  "bin": "manylicenses.js"
 }
