@@ -61,9 +61,9 @@ if (inheritOptions) {
   try {
     const { manylicenses } = fs.readFileSync(`${process.cwd()}/package.json`)
     if (manylicenses) {
-      approved.push(...manylicenses.approved)
-      excludes.push(...manylicenses.excludes)
-      excludedPrefixes.push(...manylicenses.excludedPrefixes)
+      approved.push(...manylicenses.approve)
+      excludes.push(...manylicenses.exclude)
+      excludedPrefixes.push(...manylicenses.excludedPrefix)
     }
   } catch {}
 }
