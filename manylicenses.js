@@ -95,15 +95,20 @@ const unapproved = []
 
 for (const rowArray of body) {
   const row = {}
-  head.forEach((key, i) => (row[key] = rowArray[i]))
+  head.forEach((key, i) => {
+    const value = rowArray[i]
+    // drop unknowns
+    if (value.toLowerCase() === 'unknown') return
+    row[key] = rowArray[i]
+  })
 
   const {
-    Name: name,
-    Version: version,
-    License: spdx,
-    VendorName: rowAuthorName,
-    VendorURL: rowHomepage,
-    URL: rowRepository,
+    Name: name = '',
+    Version: version = '',
+    License: spdx = '',
+    VendorName: rowAuthorName = '',
+    VendorURL: rowHomepage = '',
+    URL: rowRepository = '',
   } = row
 
   // skip excluded packages
@@ -139,7 +144,7 @@ for (const rowArray of body) {
     const everyone = [authorName, ...contributorNames].join(',')
     const urls = [homepage, repository?.url || repository].filter(Boolean).join(',')
 
-    console.log(`${name}, "${version}", "${spdx}", "${description}", "${everyone}", "${urls}"`)
+    console.log(`"${name}", "${version}", "${spdx}", "${description}", "${everyone}", "${urls}"`)
   }
 
   counts[spdx] = (counts[spdx] || 0) + 1
