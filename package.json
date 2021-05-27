@@ -13,11 +13,13 @@
   ],
   "manylicenses": {
     "approve": [
-      "MIT"
+      "MIT",
+      "Apache-2.0"
     ]
   },
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "test": "yarn licenses list --json | node ./lib/manylicenses.js --csv --counts"
   },
   "bin": {
     "manylicenses": "./lib/manylicenses.js"
