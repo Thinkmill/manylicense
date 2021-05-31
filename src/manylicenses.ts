@@ -24,7 +24,7 @@ import fs from 'fs'
 
 const { argv } = process
 
-function parseList (prefix) {
+function parseList(prefix: string) {
   const list = []
   for (const arg of argv) {
     if (!arg.startsWith(prefix)) continue
@@ -43,7 +43,7 @@ const verify = !argv.includes('--no-verify') // ignore unapproved licenses
 
 if (printHelp) {
   // print and exit
-  console.error(```
+  console.error(`
 Usage: manylicenses [options]
 
 Options:
@@ -53,17 +53,27 @@ Options:
   --exclude=NAME[,...]
   --exclude-prefix=NAME[,...]
   --no-verify
-  ```)
+  `)
   process.exit(0)
 }
 
 // merge options from CWD/package.json
-let manylicenses
+let manylicenses:
+  | {
+      approve?: string | string[]
+      exclude?: string | string[]
+      excludePrefix?: string | string[]
+    }
+  | undefined
+
 try {
-  ({ manylicenses } = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`)))
+  const pkg = JSON.parse(
+    fs.readFileSync(`${process.cwd()}/package.json`).toString()
+  )
+  manylicenses = pkg.manylicenses
 } catch {}
 
-function coerceArray (value) {
+function coerceArray(value: string | string[]) {
   return Array.isArray(value) ? value : [value]
 }
 
@@ -74,15 +84,21 @@ if (manylicenses) {
 }
 
 // read everything from stdin
-const { data } = fs.readFileSync(0)
+const { data } = fs
+  .readFileSync(0)
   .toString('utf8')
   .split('\n')
   .filter(Boolean)
-  .map(x => JSON.parse(x))
-  .filter(x => x.type === 'table')
-  .pop()
+  .map((x) => JSON.parse(x))
+  .filter((x) => x.type === 'table')
+  .pop() as {
+  data: {
+    head: string[]
+    body: string[][]
+  }
+}
 
-function fail (message) {
+function fail(message: string) {
   console.error(message)
   process.exit(1)
 }
@@ -92,11 +108,11 @@ if (printCsv) {
 }
 
 const { head, body } = data
-const counts = {}
+const counts: Record<string, number> = {}
 const unapproved = []
 
 for (const rowArray of body) {
-  const row = {}
+  const row: Record<string, string> = {}
   head.forEach((key, i) => {
     const value = rowArray[i]
     // drop unknowns
@@ -117,9 +133,13 @@ for (const rowArray of body) {
   if (excludes.includes(name)) continue
 
   // skip if prefix matches
-  if (excludePrefixes.some((prefix) => {
-    return name.startsWith(prefix)
-  })) continue
+  if (
+    excludePrefixes.some((prefix) => {
+      return name.startsWith(prefix)
+    })
+  ) {
+    continue
+  }
 
   // exit error code if unapproved
   if (verify && !approved.includes(spdx)) {
@@ -128,9 +148,18 @@ for (const rowArray of body) {
   }
 
   if (printCsv) {
-    let packageJson
+    let packageJson: {
+      description?: string
+      author?: string | { name?: string }
+      contributors?: string | string[] | { name?: string }[]
+      homepage?: string
+      repository?: string | { type: string; url: string; directory?: string }
+    } = {}
+
     try {
-      packageJson = JSON.parse(fs.readFileSync(`./node_modules/${name}/package.json`))
+      packageJson = JSON.parse(
+        fs.readFileSync(`./node_modules/${name}/package.json`).toString()
+      )
     } catch (e) {} // TODO: workspaces
 
     const {
@@ -138,22 +167,37 @@ for (const rowArray of body) {
       author = rowAuthorName,
       contributors = [],
       homepage = rowHomepage,
-      repository = rowRepository
+      repository = rowRepository,
     } = packageJson || {}
 
-    const authorName = author?.name || author
-    const contributorNames = contributors.map ? contributors.map(x => x?.name || x) : contributors
+    const authorName = typeof author === 'string' ? author : author?.name
+    const contributorNames = Array.isArray(contributors)
+      ? contributors.map((x: string | { name?: string }) =>
+          typeof x === 'string' ? x : x?.name || x
+        )
+      : contributors
     const everyone = [authorName, ...contributorNames].join(',')
-    const urls = [homepage, repository?.url || repository].filter(Boolean).join(',')
+    const urls = [
+      homepage,
+      typeof repository === 'string' ? repository : repository?.url,
+    ]
+      .filter(Boolean)
+      .join(',')
 
-    console.log(`"${name}", "${version}", "${spdx}", "${description}", "${everyone}", "${urls}"`)
+    console.log(
+      `"${name}", "${version}", "${spdx}", "${description}", "${everyone}", "${urls}"`
+    )
   }
 
   counts[spdx] = (counts[spdx] || 0) + 1
 }
 
 if (unapproved.length) {
-  fail(`Unapproved licenses: ${[...new Set(unapproved.map(({ spdx }) => `"${spdx}"`))].join(', ')}`)
+  fail(
+    `Unapproved licenses: ${[
+      ...new Set(unapproved.map(({ spdx }) => `"${spdx}"`)),
+    ].join(', ')}`
+  )
 }
 
 if (printCounts) {
