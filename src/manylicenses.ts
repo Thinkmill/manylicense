@@ -137,8 +137,9 @@ for (const rowArray of body) {
     excludePrefixes.some((prefix) => {
       return name.startsWith(prefix)
     })
-  )
+  ) {
     continue
+  }
 
   // exit error code if unapproved
   if (verify && !approved.includes(spdx)) {
