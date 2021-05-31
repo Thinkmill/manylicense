@@ -44,7 +44,7 @@ const verify = !argv.includes('--no-verify') // ignore unapproved licenses
 if (printHelp) {
   // print and exit
   console.error(`
-Usage: manylicenses [options]
+Usage: manylicense [options]
 
 Options:
   --counts
@@ -58,7 +58,7 @@ Options:
 }
 
 // merge options from CWD/package.json
-let manylicenses:
+let manylicense:
   | {
       approve?: string | string[]
       exclude?: string | string[]
@@ -70,17 +70,17 @@ try {
   const pkg = JSON.parse(
     fs.readFileSync(`${process.cwd()}/package.json`).toString()
   )
-  manylicenses = pkg.manylicenses
+  manylicense = pkg.manylicense
 } catch {}
 
 function coerceArray(value: string | string[]) {
   return Array.isArray(value) ? value : [value]
 }
 
-if (manylicenses) {
-  approved.push(...coerceArray(manylicenses?.approve || []))
-  excludes.push(...coerceArray(manylicenses?.exclude || []))
-  excludePrefixes.push(...coerceArray(manylicenses?.excludePrefix || []))
+if (manylicense) {
+  approved.push(...coerceArray(manylicense?.approve || []))
+  excludes.push(...coerceArray(manylicense?.exclude || []))
+  excludePrefixes.push(...coerceArray(manylicense?.excludePrefix || []))
 }
 
 // read everything from stdin

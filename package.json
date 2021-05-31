@@ -1,17 +1,17 @@
 {
-  "name": "manylicenses",
+  "name": "manylicense",
   "version": "0.0.1",
   "license": "MIT",
   "type": "module",
   "author": "Thinkmill Labs Pty Ltd",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thinkmill/manylicenses.git"
+    "url": "https://github.com/thinkmill/manylicense.git"
   },
   "files": [
     "lib/*"
   ],
-  "manylicenses": {
+  "manylicense": {
     "approve": [
       "MIT",
       "Apache-2.0"
@@ -20,10 +20,10 @@
   "scripts": {
     "format": "prettier --write .",
     "build": "tsc -p .",
-    "test": "yarn licenses list --json | node ./lib/manylicenses.js --csv --counts"
+    "test": "yarn licenses list --json | node ./lib/manylicense.js --csv --counts"
   },
   "bin": {
-    "manylicenses": "./lib/manylicenses.js"
+    "manylicense": "./lib/manylicense.js"
   },
   "devDependencies": {
     "@types/node": "^15.6.1",

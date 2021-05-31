@@ -1,5 +1,4 @@
-# manylicenses
-
+# manylicense
 A `node_modules` license reporting tool for monorepos that use yarn workspaces.
 
 **WARNING**: This tool is a work in progress, please report any bugs! If you need something safe for your production tooling, this probably isn't for you... yet.
@@ -7,7 +6,7 @@ A `node_modules` license reporting tool for monorepos that use yarn workspaces.
 ## Examples
 
 ```
-yarn licenses list --json | manylicenses --csv --approve=MIT,zlib --excludePrefix=@thinkmill
+yarn licenses list --json | manylicense --csv --approve=MIT,zlib --excludePrefix=@thinkmill
 ```
 
 ## LICENSE [MIT](LICENSE)
