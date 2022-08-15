@@ -71,7 +71,7 @@ try {
     fs.readFileSync(`${process.cwd()}/package.json`).toString()
   )
   manylicense = pkg.manylicense
-} catch {}
+} catch (e) {}
 
 function coerceArray(value: string | string[]) {
   return Array.isArray(value) ? value : [value]
