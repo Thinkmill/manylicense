@@ -21,6 +21,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 import fs from 'fs'
+import path from 'path'
 
 const { argv } = process
 
@@ -67,11 +68,10 @@ let manylicense:
   | undefined
 
 try {
-  const pkg = JSON.parse(
-    fs.readFileSync(`${process.cwd()}/package.json`).toString()
-  )
-  manylicense = pkg.manylicense
-} catch (e) {}
+  const packageJsonPath = path.join(process.cwd(), '/package.json')
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString())
+  manylicense = packageJson.manylicense
+} catch {}
 
 function coerceArray(value: string | string[]) {
   return Array.isArray(value) ? value : [value]
